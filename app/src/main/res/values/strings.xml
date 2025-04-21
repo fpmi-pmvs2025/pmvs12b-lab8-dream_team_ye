@@ -1,3 +1,38 @@
 <resources>
-    <string name="app_name">MockCrypto</string>
+    <string name="app_name">Крипто Трекер</string>
+
+    <string name="bottom_nav_dashboard">Обзор</string>
+    <string name="bottom_nav_portfolio">Портфель</string>
+
+    <string name="dashboard_title">Криптовалюты</string>
+    <string name="crypto_price_label">Цена:</string>
+    <string name="crypto_change_label">Изм. (24ч):</string>
+    <string name="crypto_volume_label">Объем (24ч):</string>
+    <string name="error_loading_data">Ошибка загрузки данных</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="loading">Загрузка…</string>
+
+    <string name="crypto_detail_title">Детали</string>
+    <string name="buy_button">Купить (Демо)</string>
+    <string name="sell_button">Продать (Демо)</string>
+    <string name="historical_data_placeholder">Место для графика истории</string>
+    <string name="analytics_notes_placeholder">Место для аналитических заметок</string>
+
+    <string name="portfolio_title">Демо Портфель</string>
+    <string name="current_balance">Текущий Баланс:</string>
+    <string name="total_value">Стоимость Активов:</string>
+    <string name="total_pnl">Общий P/L:</string>
+    <string name="your_assets">Ваши Активы</string>
+    <string name="transaction_history">История Транзакций</string>
+    <string name="no_assets">У вас пока нет активов.</string>
+    <string name="no_transactions">Нет истории транзакций.</string>
+    <string name="portfolio_amount">Количество:</string>
+    <string name="portfolio_avg_buy_price">Ср. цена покупки:</string>
+    <string name="portfolio_current_value">Текущая стоимость:</string>
+    <string name="transaction_type_buy">ПОКУПКА</string>
+    <string name="transaction_type_sell">ПРОДАЖА</string>
+    <string name="transaction_details">%1$s %2$s %3$s по %4$s</string> <string name="transaction_time">Время:</string>
+
+    <string name="usd_symbol">$</string>
+    <string name="percentage_symbol">%</string>
 </resources>
