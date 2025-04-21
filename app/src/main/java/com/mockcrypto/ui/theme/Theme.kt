@@ -47,7 +47,7 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun CryptoTrackerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = ThemeController.isDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {

@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.mockcrypto.ui.screens.dashboard.DashboardScreen
 import com.mockcrypto.ui.screens.details.CryptoDetailScreen
 import com.mockcrypto.ui.screens.portfolio.PortfolioScreen
+import com.mockcrypto.ui.screens.profile.ProfileScreen
 
 @Composable
 fun AppNavHost(
@@ -34,6 +35,12 @@ fun AppNavHost(
                 onCryptoClick = { cryptoId ->
                     navController.navigate(AppDestination.CryptoDetail.createRoute(cryptoId))
                 }
+            )
+        }
+        
+        composable(route = AppDestination.Profile.route) {
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
         

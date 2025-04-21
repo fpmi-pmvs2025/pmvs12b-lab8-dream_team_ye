@@ -21,21 +21,29 @@ interface PortfolioRepository {
         price: BigDecimal,
         type: TransactionType
     ): Result<Unit> // Просто сообщаем об успехе/неудаче
+    
+    // New method to reset portfolio data
+    suspend fun resetPortfolio(): Result<Unit>
 }
 
 // --- МОК РЕАЛИЗАЦИЯ ---
 class MockPortfolioRepository : PortfolioRepository {
 
-    // Начальное состояние (можно будет сохранять в Room/DataStore)
-    private var currentBalance = BigDecimal("10000.00")
-    private val portfolio = mutableListOf(
+    // Initial state values
+    private val INITIAL_BALANCE = BigDecimal("10000.00")
+    private val INITIAL_PORTFOLIO = listOf(
         PortfolioItem("bitcoin", "BTC", "Bitcoin", BigDecimal("0.05"), BigDecimal("60000.00"), BigDecimal("68500.50")),
         PortfolioItem("ethereum", "ETH", "Ethereum", BigDecimal("1.5"), BigDecimal("3200.00"), BigDecimal("3500.75"))
     )
-    private val transactions = mutableListOf(
+    private val INITIAL_TRANSACTIONS = listOf(
         Transaction(UUID.randomUUID().toString(), "bitcoin", "BTC", TransactionType.BUY, BigDecimal("0.05"), BigDecimal("60000.00"), LocalDateTime.now().minusDays(5)),
         Transaction(UUID.randomUUID().toString(), "ethereum", "ETH", TransactionType.BUY, BigDecimal("1.5"), BigDecimal("3200.00"), LocalDateTime.now().minusDays(3))
     )
+
+    // Mutable state
+    private var currentBalance = INITIAL_BALANCE
+    private val portfolio = INITIAL_PORTFOLIO.toMutableList()
+    private val transactions = INITIAL_TRANSACTIONS.toMutableList()
 
     override suspend fun getDemoAccountState(): Result<DemoAccountState> {
         delay(300)
@@ -107,6 +115,23 @@ class MockPortfolioRepository : PortfolioRepository {
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+    
+    override suspend fun resetPortfolio(): Result<Unit> {
+        delay(1000) // Simulate processing time
+        
+        try {
+            // Reset to initial state
+            currentBalance = INITIAL_BALANCE
+            portfolio.clear()
+            portfolio.addAll(INITIAL_PORTFOLIO)
+            transactions.clear()
+            transactions.addAll(INITIAL_TRANSACTIONS)
+            
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 }

@@ -42,7 +42,8 @@ fun CryptoTrackerApp() {
     val navController = rememberNavController()
     val items = listOf(
         AppDestination.Dashboard,
-        AppDestination.Portfolio
+        AppDestination.Portfolio,
+        AppDestination.Profile
     )
     
     Scaffold(
