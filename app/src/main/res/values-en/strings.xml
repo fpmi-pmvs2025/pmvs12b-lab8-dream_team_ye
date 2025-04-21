@@ -31,8 +31,35 @@
     <string name="portfolio_current_value">Current Value:</string>
     <string name="transaction_type_buy">BUY</string>
     <string name="transaction_type_sell">SELL</string>
-    <string name="transaction_details">%1$s %2$s @ %3$s</string> <string name="transaction_time">Time:</string>
+    <string name="transaction_details">%1$s %2$s @ %3$s</string>
+    <string name="transaction_time">Time:</string>
 
     <string name="usd_symbol">$</string>
     <string name="percentage_symbol">%</string>
+
+    <!-- New strings for portfolio screen -->
+    <string name="account_summary">Account Summary</string>
+    <string name="available_balance">Available Balance</string>
+    <string name="portfolio_value">Portfolio Value</string>
+    <string name="account_data_not_available">Account data not available</string>
+    <string name="empty_portfolio_message">Your portfolio is empty</string>
+    <string name="empty_portfolio_instruction">Go to a cryptocurrency page to buy assets</string>
+    <string name="bought_amount">Bought %1$s %2$s</string>
+    <string name="sold_amount">Sold %1$s %2$s</string>
+
+    <!-- New strings for detail screen -->
+    <string name="chart_placeholder">Price chart will be here</string>
+    <string name="trade">Trade</string>
+    <string name="buy">Buy</string>
+    <string name="sell">Sell</string>
+    <string name="amount_in_crypto">Amount in %1$s</string>
+    <string name="total">Total</string>
+    <string name="execute_buy">Buy %1$s</string>
+    <string name="execute_sell">Sell %1$s</string>
+    <string name="market_info">Market Information</string>
+    <string name="market_cap">Market Cap</string>
+    <string name="volume_24h">24h Volume</string>
+    <string name="circulating_supply">Circulating Supply</string>
+    <string name="all_time_high">All Time High</string>
+    <string name="no_data_available">No data available</string>
 </resources>

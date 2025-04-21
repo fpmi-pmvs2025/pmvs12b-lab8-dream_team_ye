@@ -18,7 +18,6 @@ data class DashboardUiState(
 )
 
 class DashboardViewModel : ViewModel() {
-    // ToDo: Replace with dependency injection
     private val repository: CryptoRepository = MockCryptoRepository()
     
     private val _uiState = MutableStateFlow(DashboardUiState(isLoading = true))

@@ -13,24 +13,18 @@ import kotlinx.coroutines.launch
 
 data class CryptoDetailUiState(
     val isLoading: Boolean = false,
-    val cryptoCurrency: CryptoCurrency? = null,
+    val cryptoDetails: CryptoCurrency? = null,
     val error: String? = null
 )
 
-class CryptoDetailViewModel(
-    private val cryptoId: String
-) : ViewModel() {
+class CryptoDetailViewModel : ViewModel() {
     // Todo: Replace with dependency injection
     private val repository: CryptoRepository = MockCryptoRepository()
     
-    private val _uiState = MutableStateFlow(CryptoDetailUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(CryptoDetailUiState(isLoading = false))
     val uiState: StateFlow<CryptoDetailUiState> = _uiState.asStateFlow()
     
-    init {
-        loadCryptoDetails()
-    }
-    
-    fun loadCryptoDetails() {
+    fun loadCryptoDetails(cryptoId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             
@@ -38,7 +32,7 @@ class CryptoDetailViewModel(
                 .onSuccess { crypto ->
                     _uiState.update { it.copy(
                         isLoading = false,
-                        cryptoCurrency = crypto,
+                        cryptoDetails = crypto,
                         error = null
                     ) }
                 }

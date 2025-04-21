@@ -30,7 +30,11 @@ fun AppNavHost(
         }
         
         composable(route = AppDestination.Portfolio.route) {
-            PortfolioScreen()
+            PortfolioScreen(
+                onCryptoClick = { cryptoId ->
+                    navController.navigate(AppDestination.CryptoDetail.createRoute(cryptoId))
+                }
+            )
         }
         
         composable(

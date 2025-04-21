@@ -31,8 +31,34 @@
     <string name="portfolio_current_value">Текущая стоимость:</string>
     <string name="transaction_type_buy">ПОКУПКА</string>
     <string name="transaction_type_sell">ПРОДАЖА</string>
-    <string name="transaction_details">%1$s %2$s %3$s по %4$s</string> <string name="transaction_time">Время:</string>
+    <string name="transaction_details">%1$s %2$s %3$s по %4$s</string>
+    <string name="transaction_time">Время:</string>
 
     <string name="usd_symbol">$</string>
     <string name="percentage_symbol">%</string>
+
+    <string name="account_summary">Состояние счета</string>
+    <string name="available_balance">Доступный баланс</string>
+    <string name="portfolio_value">Стоимость портфеля</string>
+    <string name="account_data_not_available">Данные счета недоступны</string>
+    <string name="empty_portfolio_message">Ваш портфель пуст</string>
+    <string name="empty_portfolio_instruction">Перейдите на страницу криптовалюты, чтобы купить
+        активы</string>
+    <string name="bought_amount">Куплено %1$s %2$s</string>
+    <string name="sold_amount">Продано %1$s %2$s</string>
+
+    <string name="chart_placeholder">График цены будет здесь</string>
+    <string name="trade">Торговля</string>
+    <string name="buy">Купить</string>
+    <string name="sell">Продать</string>
+    <string name="amount_in_crypto">Количество в %1$s</string>
+    <string name="total">Итого</string>
+    <string name="execute_buy">Купить %1$s</string>
+    <string name="execute_sell">Продать %1$s</string>
+    <string name="market_info">Информация о рынке</string>
+    <string name="market_cap">Рыночная капитализация</string>
+    <string name="volume_24h">Объем торгов (24ч)</string>
+    <string name="circulating_supply">В обращении</string>
+    <string name="all_time_high">Исторический максимум</string>
+    <string name="no_data_available">Нет данных</string>
 </resources>
