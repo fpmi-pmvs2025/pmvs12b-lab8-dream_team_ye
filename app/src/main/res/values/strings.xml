@@ -83,4 +83,11 @@
     <string name="profile_confirm">Подтвердить</string>
     <string name="profile_cancel">Отмена</string>
     <string name="profile_save">Сохранить</string>
+
+    <!-- New strings for portfolio -->
+    <string name="total_balance">Общий баланс</string>
+    <string name="available_cash">Доступные средства</string>
+    <string name="profit_loss">Прибыль/Убыток</string>
+    <string name="add_funds">Пополнить</string>
+    <string name="amount">Количество</string>
 </resources>

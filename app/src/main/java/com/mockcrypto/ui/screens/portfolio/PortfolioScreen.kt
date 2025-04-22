@@ -66,7 +66,9 @@ import java.time.format.FormatStyle
 fun PortfolioScreen(
     onCryptoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PortfolioViewModel = viewModel()
+    viewModel: PortfolioViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = PortfolioViewModel.Factory()
+    )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -257,13 +259,14 @@ private fun ErrorState(
 }
 
 @Composable
-private fun AccountSummaryCard(
+fun AccountSummaryCard(
     accountState: DemoAccountState?,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -271,24 +274,31 @@ private fun AccountSummaryCard(
                 .padding(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.account_summary),
-                style = MaterialTheme.typography.titleLarge
+                text = stringResource(R.string.total_balance),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            
+            Text(
+                text = "$${accountState?.totalBalance?.toPlainString() ?: "0.00"}",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            if (accountState != null) {
+            // Portfolio value and profit/loss summary
+            if (accountState?.totalPortfolioValue?.compareTo(BigDecimal.ZERO) ?: 0 > 0) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
                         Text(
-                            text = stringResource(R.string.available_balance),
+                            text = stringResource(R.string.portfolio_value),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "$${formatCurrency(accountState.balance)}",
+                            text = "$${accountState?.totalPortfolioValue?.toPlainString() ?: "0.00"}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -296,65 +306,58 @@ private fun AccountSummaryCard(
                     
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = stringResource(R.string.portfolio_value),
+                            text = stringResource(R.string.profit_loss),
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        Text(
-                            text = "$${formatCurrency(accountState.totalPortfolioValue)}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
+                        
+                        val profitLoss = accountState?.totalProfitLoss ?: BigDecimal.ZERO
+                        val isPositive = profitLoss >= BigDecimal.ZERO
+                        
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = if (isPositive) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                                contentDescription = null,
+                                tint = if (isPositive) Color.Green else Color.Red,
+                                modifier = Modifier.height(16.dp)
+                            )
+                            Text(
+                                text = "$${profitLoss.abs().toPlainString()} (${accountState?.profitLossPercentage?.toPlainString() ?: "0.00"}%)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isPositive) Color.Green else Color.Red
+                            )
+                        }
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Profit/Loss indicator
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = if (accountState.totalProfitLoss >= BigDecimal.ZERO)
-                                Color(0xFF4CAF50).copy(alpha = 0.1f)
-                            else
-                                Color(0xFFF44336).copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = if (accountState.totalProfitLoss >= BigDecimal.ZERO)
-                            Icons.Default.ArrowUpward
-                        else
-                            Icons.Default.ArrowDownward,
-                        contentDescription = null,
-                        tint = if (accountState.totalProfitLoss >= BigDecimal.ZERO)
-                            Color(0xFF4CAF50)
-                        else
-                            Color(0xFFF44336)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
+            // Cash balance
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
                     Text(
-                        text = if (accountState.totalProfitLoss >= BigDecimal.ZERO)
-                            "+$${formatCurrency(accountState.totalProfitLoss)}"
-                        else
-                            "-$${formatCurrency(accountState.totalProfitLoss.abs())}",
+                        text = stringResource(R.string.available_cash),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "$${accountState?.balance?.toPlainString() ?: "0.00"}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (accountState.totalProfitLoss >= BigDecimal.ZERO)
-                            Color(0xFF4CAF50)
-                        else
-                            Color(0xFFF44336)
+                        fontWeight = FontWeight.Bold
                     )
                 }
-            } else {
-                Text(
-                    text = stringResource(R.string.account_data_not_available),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
+                
+                Button(
+                    onClick = { /* TODO: Add funds functionality */ }
+                ) {
+                    Text(text = stringResource(R.string.add_funds))
+                }
             }
         }
     }
@@ -362,7 +365,7 @@ private fun AccountSummaryCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PortfolioItemCard(
+fun PortfolioItemCard(
     portfolioItem: PortfolioItem,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -378,60 +381,79 @@ private fun PortfolioItemCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            // Left: Icon and name
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // TODO: Add icon loading here with Coil
+                    Text(
+                        text = portfolioItem.symbol,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 Text(
                     text = portfolioItem.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Text(
-                    text = portfolioItem.symbol,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             
+            // Middle: Amount
             Column(
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(0.8f)
             ) {
                 Text(
-                    text = "$${formatCurrency(portfolioItem.currentValue)}",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = portfolioItem.amount.toPlainString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.amount),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            // Right: Value and profit/loss
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "$${portfolioItem.currentValue?.toPlainString() ?: (portfolioItem.amount * portfolioItem.averageBuyPrice).toPlainString()}",
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
                 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                val profitLoss = portfolioItem.profitLoss ?: BigDecimal.ZERO
+                val isPositive = profitLoss >= BigDecimal.ZERO
+                
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (profitLoss != BigDecimal.ZERO) {
+                        Icon(
+                            imageVector = if (isPositive) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                            contentDescription = null,
+                            tint = if (isPositive) Color.Green else Color.Red,
+                            modifier = Modifier.height(12.dp)
+                        )
+                    }
                     Text(
-                        text = "${portfolioItem.amount} ${portfolioItem.symbol}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = if (profitLoss != BigDecimal.ZERO) {
+                            "${portfolioItem.profitLossPercentage?.toPlainString() ?: "0.00"}%"
+                        } else {
+                            "0.00%"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = when {
+                            profitLoss > BigDecimal.ZERO -> Color.Green
+                            profitLoss < BigDecimal.ZERO -> Color.Red
+                            else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        }
                     )
                 }
-                
-                // Calculate and display profit/loss percentage
-                val profitLossAmount = portfolioItem.currentValue - (portfolioItem.amount * portfolioItem.averageBuyPrice)
-                val profitLossPercentage = if (portfolioItem.averageBuyPrice > BigDecimal.ZERO) {
-                    profitLossAmount.divide(portfolioItem.amount * portfolioItem.averageBuyPrice, 4, BigDecimal.ROUND_HALF_UP) * BigDecimal(100)
-                } else {
-                    BigDecimal.ZERO
-                }
-                
-                val isProfitable = profitLossAmount >= BigDecimal.ZERO
-                val profitLossColor = if (isProfitable) Color(0xFF4CAF50) else Color(0xFFF44336)
-                
-                Text(
-                    text = if (isProfitable) 
-                        "+${profitLossPercentage.setScale(2, BigDecimal.ROUND_HALF_UP)}%" 
-                    else 
-                        "${profitLossPercentage.setScale(2, BigDecimal.ROUND_HALF_UP)}%",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = profitLossColor
-                )
             }
         }
     }

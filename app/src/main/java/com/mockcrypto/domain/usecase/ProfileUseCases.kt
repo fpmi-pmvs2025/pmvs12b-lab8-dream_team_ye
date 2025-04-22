@@ -37,10 +37,14 @@ class ResetPortfolioUseCase(private val repository: PortfolioRepository) {
     }
 }
 
-data class ProfileUseCases(
-    val getUserProfile: GetUserProfileUseCase,
-    val logout: LogoutUseCase,
-    val getUserSettings: GetUserSettingsUseCase,
-    val updateThemeMode: UpdateThemeModeUseCase,
-    val resetPortfolio: ResetPortfolioUseCase
-) 
+class ProfileUseCases(
+    private val userRepository: UserRepository,
+    private val settingsRepository: SettingsRepository,
+    private val portfolioRepository: PortfolioRepository
+) {
+    val getUserProfile = GetUserProfileUseCase(userRepository)
+    val logout = LogoutUseCase(userRepository)
+    val getUserSettings = GetUserSettingsUseCase(settingsRepository)
+    val updateThemeMode = UpdateThemeModeUseCase(settingsRepository)
+    val resetPortfolio = ResetPortfolioUseCase(portfolioRepository)
+} 
