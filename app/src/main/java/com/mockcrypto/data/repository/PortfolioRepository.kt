@@ -1,10 +1,15 @@
 package com.mockcrypto.data.repository
 
+import android.content.Context
+import com.mockcrypto.data.local.AppDatabase
+import com.mockcrypto.data.local.entity.AccountInfoEntity
+import com.mockcrypto.data.local.mapper.PortfolioMapper
 import com.mockcrypto.domain.model.DemoAccountState
 import com.mockcrypto.domain.model.PortfolioItem
 import com.mockcrypto.domain.model.Transaction
 import com.mockcrypto.domain.model.TransactionType
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -15,54 +20,64 @@ interface PortfolioRepository {
     suspend fun getTransactionHistory(): Result<List<Transaction>>
     suspend fun simulateTrade(
         cryptoId: String,
-        symbol: String, // Добавим символ для удобства
-        name: String, // Добавим имя для удобства
+        symbol: String,
+        name: String,
         amount: BigDecimal,
         price: BigDecimal,
         type: TransactionType
-    ): Result<Unit> // Просто сообщаем об успехе/неудаче
+    ): Result<Unit>
     
     suspend fun resetPortfolio(): Result<Unit>
 }
 
-// --- МОК РЕАЛИЗАЦИЯ ---
-class MockPortfolioRepository : PortfolioRepository {
+class RoomPortfolioRepository(
+    context: Context
+) : PortfolioRepository {
+    
+    private val portfolioDao = AppDatabase.getInstance(context).portfolioDao()
 
-    // Initial state values
-    private val INITIAL_BALANCE = BigDecimal("10000.00")
-    private val INITIAL_PORTFOLIO = listOf(
-        PortfolioItem("bitcoin", "BTC", "Bitcoin", BigDecimal("0.05"), BigDecimal("60000.00"), BigDecimal("68500.50")),
-        PortfolioItem("ethereum", "ETH", "Ethereum", BigDecimal("1.5"), BigDecimal("3200.00"), BigDecimal("3500.75"))
-    )
-    private val INITIAL_TRANSACTIONS = listOf(
-        Transaction(UUID.randomUUID().toString(), "bitcoin", "BTC", TransactionType.BUY, BigDecimal("0.05"), BigDecimal("60000.00"), LocalDateTime.now().minusDays(5)),
-        Transaction(UUID.randomUUID().toString(), "ethereum", "ETH", TransactionType.BUY, BigDecimal("1.5"), BigDecimal("3200.00"), LocalDateTime.now().minusDays(3))
-    )
+    private val INITIAL_BALANCE = BigDecimal("1000000.00")
+    
+    override suspend fun getDemoAccountState(): Result<DemoAccountState> = withContext(Dispatchers.IO) {
+        try {
+            val accountInfo = portfolioDao.getAccountInfo()
+            val balance = accountInfo?.let { BigDecimal(it.balance) } ?: initializeAccount()
 
-    // Mutable state
-    private var currentBalance = INITIAL_BALANCE
-    private val portfolio = INITIAL_PORTFOLIO.toMutableList()
-    private val transactions = INITIAL_TRANSACTIONS.toMutableList()
-
-    override suspend fun getDemoAccountState(): Result<DemoAccountState> {
-        delay(300)
-        val totalValue = portfolio.sumOf { it.currentValue }
-        val totalCostBasis = portfolio.sumOf { it.amount * it.averageBuyPrice } // Упрощенный расчет P/L
-        val totalProfitLoss = totalValue - totalCostBasis // Очень упрощенно!
-        return Result.success(DemoAccountState(currentBalance, totalValue, totalProfitLoss))
+            return@withContext Result.success(DemoAccountState(
+                balance = balance,
+                totalPortfolioValue = BigDecimal.ZERO,
+                totalProfitLoss = BigDecimal.ZERO
+            ))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-
-    override suspend fun getPortfolioItems(): Result<List<PortfolioItem>> {
-        delay(400)
-        // В реальном приложении нужно обновить currentPrice из CryptoRepository
-        return Result.success(portfolio.toList())
+    
+    private suspend fun initializeAccount(): BigDecimal {
+        portfolioDao.insertAccountInfo(AccountInfoEntity(balance = INITIAL_BALANCE.toPlainString()))
+        return INITIAL_BALANCE
     }
-
-    override suspend fun getTransactionHistory(): Result<List<Transaction>> {
-        delay(200)
-        return Result.success(transactions.sortedByDescending { it.timestamp })
+    
+    override suspend fun getPortfolioItems(): Result<List<PortfolioItem>> = withContext(Dispatchers.IO) {
+        try {
+            val entities = portfolioDao.getAllPortfolioItems()
+            val portfolioItems = entities.map { PortfolioMapper.mapToDomain(it) }
+            Result.success(portfolioItems)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
-
+    
+    override suspend fun getTransactionHistory(): Result<List<Transaction>> = withContext(Dispatchers.IO) {
+        try {
+            val entities = portfolioDao.getAllTransactions()
+            val transactions = entities.map { PortfolioMapper.mapToDomain(it) }
+            Result.success(transactions)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     override suspend fun simulateTrade(
         cryptoId: String,
         symbol: String,
@@ -70,67 +85,121 @@ class MockPortfolioRepository : PortfolioRepository {
         amount: BigDecimal,
         price: BigDecimal,
         type: TransactionType
-    ): Result<Unit> {
-        delay(500) // Имитация обработки сделки
-        val cost = amount * price
-        val transactionId = UUID.randomUUID().toString()
-
-        return try {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val cost = amount * price
+            val transactionId = UUID.randomUUID().toString()
+            
             when (type) {
                 TransactionType.BUY -> {
-                    if (currentBalance >= cost) {
-                        currentBalance -= cost
-                        // Добавить или обновить позицию в портфеле (логика усреднения не реализована!)
-                        val existingItem = portfolio.find { it.cryptoId == cryptoId }
-                        if (existingItem != null) {
-                            // TODO: Реализовать логику усреднения цены покупки
-                            val newAmount = existingItem.amount + amount
-                            portfolio.remove(existingItem)
-                            portfolio.add(existingItem.copy(amount = newAmount, currentPrice = price /* Обновляем для согласованности */))
-                        } else {
-                            portfolio.add(PortfolioItem(cryptoId, symbol, name, amount, price, price))
-                        }
-                        transactions.add(Transaction(transactionId, cryptoId, symbol, type, amount, price, LocalDateTime.now()))
-                        Result.success(Unit)
+                    // Get current balance
+                    val accountInfo = portfolioDao.getAccountInfo() 
+                        ?: AccountInfoEntity(balance = INITIAL_BALANCE.toPlainString())
+                    val currentBalance = BigDecimal(accountInfo.balance)
+                    
+                    // Check if balance is sufficient
+                    if (currentBalance < cost) {
+                        return@withContext Result.failure(Exception("Insufficient balance"))
+                    }
+                    
+                    // Update balance
+                    val newBalance = currentBalance - cost
+                    portfolioDao.updateBalance(newBalance.toPlainString())
+                    
+                    // Update portfolio item
+                    val existingItem = portfolioDao.getPortfolioItemById(cryptoId)
+                    if (existingItem != null) {
+                        // Calculate new average buy price
+                        val currentAmount = BigDecimal(existingItem.amount)
+                        val currentAvgPrice = BigDecimal(existingItem.averageBuyPrice)
+                        
+                        val newAmount = currentAmount + amount
+                        val newAvgPrice = calculateNewAverageBuyPrice(
+                            currentAmount, currentAvgPrice, amount, price
+                        )
+                        
+                        val updatedItem = existingItem.copy(
+                            amount = newAmount.toPlainString(),
+                            averageBuyPrice = newAvgPrice.toPlainString()
+                        )
+                        portfolioDao.insertPortfolioItem(updatedItem)
                     } else {
-                        Result.failure(Exception("Insufficient balance"))
+                        // Create new portfolio item
+                        val newItem = PortfolioItem(
+                            cryptoId = cryptoId,
+                            symbol = symbol,
+                            name = name,
+                            amount = amount,
+                            averageBuyPrice = price,
+                            iconUrl = null
+                        )
+                        portfolioDao.insertPortfolioItem(PortfolioMapper.mapToEntity(newItem))
                     }
                 }
+                
                 TransactionType.SELL -> {
-                    val existingItem = portfolio.find { it.cryptoId == cryptoId }
-                    if (existingItem != null && existingItem.amount >= amount) {
-                        currentBalance += cost
-                        val newAmount = existingItem.amount - amount
-                        portfolio.remove(existingItem)
-                        if (newAmount > BigDecimal.ZERO) {
-                            portfolio.add(existingItem.copy(amount = newAmount, currentPrice = price))
-                        }
-                        transactions.add(Transaction(transactionId, cryptoId, symbol, type, amount, price, LocalDateTime.now()))
-                        Result.success(Unit)
+                    // Get portfolio item
+                    val existingItem = portfolioDao.getPortfolioItemById(cryptoId)
+                        ?: return@withContext Result.failure(Exception("Not enough $symbol to sell or item not found"))
+                    
+                    val currentAmount = BigDecimal(existingItem.amount)
+                    if (currentAmount < amount) {
+                        return@withContext Result.failure(Exception("Not enough $symbol to sell"))
+                    }
+                    
+                    // Update balance
+                    val accountInfo = portfolioDao.getAccountInfo() 
+                        ?: AccountInfoEntity(balance = INITIAL_BALANCE.toPlainString())
+                    val currentBalance = BigDecimal(accountInfo.balance)
+                    val newBalance = currentBalance + cost
+                    portfolioDao.updateBalance(newBalance.toPlainString())
+                    
+                    // Update portfolio item
+                    val newAmount = currentAmount - amount
+                    if (newAmount > BigDecimal.ZERO) {
+                        val updatedItem = existingItem.copy(amount = newAmount.toPlainString())
+                        portfolioDao.insertPortfolioItem(updatedItem)
                     } else {
-                        Result.failure(Exception("Not enough ${symbol} to sell or item not found"))
+                        portfolioDao.deletePortfolioItem(cryptoId)
                     }
                 }
             }
+            
+            // Record transaction
+            val transaction = Transaction(
+                id = transactionId,
+                cryptoId = cryptoId,
+                symbol = symbol,
+                type = type,
+                amount = amount,
+                pricePerUnit = price,
+                timestamp = LocalDateTime.now()
+            )
+            portfolioDao.insertTransaction(PortfolioMapper.mapToEntity(transaction))
+            
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
     
-    override suspend fun resetPortfolio(): Result<Unit> {
-        delay(1000) // Simulate processing time
-        
+    private fun calculateNewAverageBuyPrice(
+        currentAmount: BigDecimal,
+        currentAvgPrice: BigDecimal,
+        newAmount: BigDecimal,
+        newPrice: BigDecimal
+    ): BigDecimal {
+        val totalValue = (currentAmount * currentAvgPrice) + (newAmount * newPrice)
+        val totalAmount = currentAmount + newAmount
+        return totalValue.divide(totalAmount, 2, BigDecimal.ROUND_HALF_UP)
+    }
+    
+    override suspend fun resetPortfolio(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            // Reset to initial state
-            currentBalance = INITIAL_BALANCE
-            portfolio.clear()
-            portfolio.addAll(INITIAL_PORTFOLIO)
-            transactions.clear()
-            transactions.addAll(INITIAL_TRANSACTIONS)
-            
-            return Result.success(Unit)
+            portfolioDao.resetPortfolio(INITIAL_BALANCE.toPlainString())
+            Result.success(Unit)
         } catch (e: Exception) {
-            return Result.failure(e)
+            Result.failure(e)
         }
     }
 }

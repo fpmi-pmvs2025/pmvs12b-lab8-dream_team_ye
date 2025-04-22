@@ -63,7 +63,6 @@ fun CryptoTrackerApp() {
                                     saveState = true
                                 }
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         }

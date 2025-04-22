@@ -1,10 +1,9 @@
 package com.mockcrypto.ui.screens.dashboard
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mockcrypto.data.repository.CoinGeckoCryptoRepository
+import com.mockcrypto.di.ServiceLocator
 import com.mockcrypto.data.repository.CryptoRepository
 import com.mockcrypto.domain.model.CryptoCurrency
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +18,8 @@ data class DashboardUiState(
     val error: String? = null
 )
 
-class DashboardViewModel(
-    context: Context
-) : ViewModel() {
-    private val repository: CryptoRepository = CoinGeckoCryptoRepository(context)
+class DashboardViewModel : ViewModel() {
+    private val repository: CryptoRepository = ServiceLocator.provideCryptoRepository()
     
     private val _uiState = MutableStateFlow(DashboardUiState(isLoading = true))
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
@@ -52,14 +49,11 @@ class DashboardViewModel(
         }
     }
     
-    /**
-     * Factory for creating the DashboardViewModel with a context parameter
-     */
-    class Factory(private val context: Context) : ViewModelProvider.Factory {
+    class Factory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
-                return DashboardViewModel(context) as T
+                return DashboardViewModel() as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
