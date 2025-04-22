@@ -40,13 +40,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mockcrypto.R
 import com.mockcrypto.domain.model.CryptoCurrency
 import com.mockcrypto.ui.components.CryptoListItem
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onCryptoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = viewModel()
+    viewModel: DashboardViewModel = viewModel(factory = DashboardViewModel.Factory(LocalContext.current))
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }

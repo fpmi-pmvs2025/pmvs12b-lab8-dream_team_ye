@@ -54,6 +54,7 @@ import com.mockcrypto.R
 import com.mockcrypto.domain.model.TransactionType
 import com.mockcrypto.ui.screens.portfolio.PortfolioViewModel
 import java.math.BigDecimal
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +62,7 @@ fun CryptoDetailScreen(
     cryptoId: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    detailViewModel: CryptoDetailViewModel = viewModel(),
+    detailViewModel: CryptoDetailViewModel = viewModel(factory = CryptoDetailViewModel.Factory(LocalContext.current)),
     portfolioViewModel: PortfolioViewModel = viewModel()
 ) {
     val detailUiState by detailViewModel.uiState.collectAsStateWithLifecycle()

@@ -1,46 +1,81 @@
 package com.mockcrypto.data.repository
 
+import android.content.Context
+import com.mockcrypto.data.mapper.CryptoMapper
+import com.mockcrypto.data.remote.ApiServiceFactory
+import com.mockcrypto.data.remote.CoinGeckoApiService
 import com.mockcrypto.domain.model.CryptoCurrency
-import kotlinx.coroutines.delay
-import java.math.BigDecimal
-import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 interface CryptoRepository {
     suspend fun getCryptoList(): Result<List<CryptoCurrency>>
     suspend fun getCryptoDetails(id: String): Result<CryptoCurrency>
 }
 
-// --- МОК РЕАЛИЗАЦИЯ (заменится реальной позже) ---
-class MockCryptoRepository : CryptoRepository {
+class CoinGeckoCryptoRepository(
+    private val context: Context
+) : CryptoRepository {
 
-    private val mockCryptos = listOf(
-        CryptoCurrency("bitcoin", "BTC", "Bitcoin", BigDecimal("68500.50"), 2.5, BigDecimal("35000000000"), "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"),
-        CryptoCurrency("ethereum", "ETH", "Ethereum", BigDecimal("3500.75"), -1.2, BigDecimal("18000000000"), "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"),
-        CryptoCurrency("solana", "SOL", "Solana", BigDecimal("150.20"), 5.8, BigDecimal("5000000000"), "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756"),
-        CryptoCurrency("dogecoin", "DOGE", "Dogecoin", BigDecimal("0.158"), 0.5, BigDecimal("1500000000"), "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409"),
-        CryptoCurrency("cardano", "ADA", "Cardano", BigDecimal("0.65"), -0.8, BigDecimal("800000000"), "https://coin-images.coingecko.com/coins/images/975/large/cardano.png?1696502090")
-    )
-
-    override suspend fun getCryptoList(): Result<List<CryptoCurrency>> {
-        delay(3000) // Имитация загрузки
-        // Имитация возможной ошибки
-        // if (Random.nextBoolean()) return Result.failure(Exception("Network Error"))
-        return Result.success(mockCryptos.shuffled()) // Возвращаем перемешанный список
+    private val apiService: CoinGeckoApiService by lazy {
+        ApiServiceFactory.createCoinGeckoApiService(context)
     }
 
-    override suspend fun getCryptoDetails(id: String): Result<CryptoCurrency> {
-        delay(500) // Имитация загрузки
-        val crypto = mockCryptos.find { it.id == id }
-        return if (crypto != null) {
-            // Добавим немного случайности в детали для наглядности
-            Result.success(
-                crypto.copy(
-                    price = crypto.price * BigDecimal(Random.nextDouble(0.99, 1.01)),
-                    changePercent24h = Random.nextDouble(-5.0, 5.0)
-                )
+    companion object {
+        private const val DEFAULT_CURRENCY = "usd"
+        private const val DEFAULT_ORDER = "market_cap_desc"
+        private const val DEFAULT_PER_PAGE = 20
+        private const val DEFAULT_PRICE_CHANGE = "24h"
+    }
+
+    override suspend fun getCryptoList(): Result<List<CryptoCurrency>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.getCoinMarkets(
+                vsCurrency = DEFAULT_CURRENCY,
+                order = DEFAULT_ORDER,
+                perPage = DEFAULT_PER_PAGE,
+                priceChangePercentage = DEFAULT_PRICE_CHANGE,
+                sparkline = false
             )
-        } else {
-            Result.failure(NoSuchElementException("Crypto with id $id not found"))
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Result.success(CryptoMapper.mapToDomain(body))
+                } else {
+                    Result.failure(IOException("Empty response body"))
+                }
+            } else {
+                Result.failure(IOException("API call failed with code: ${response.code()}, message: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCryptoDetails(id: String): Result<CryptoCurrency> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.getCoinMarkets(
+                vsCurrency = DEFAULT_CURRENCY,
+                ids = id,
+                perPage = 1,
+                priceChangePercentage = DEFAULT_PRICE_CHANGE,
+                sparkline = false
+            )
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null && body.isNotEmpty()) {
+                    Result.success(CryptoMapper.mapToDomain(body.first()))
+                } else {
+                    Result.failure(NoSuchElementException("Crypto with id $id not found"))
+                }
+            } else {
+                Result.failure(IOException("API call failed with code: ${response.code()}, message: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
