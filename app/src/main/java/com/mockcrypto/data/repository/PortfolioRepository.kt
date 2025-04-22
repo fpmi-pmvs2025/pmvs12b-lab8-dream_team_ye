@@ -22,7 +22,6 @@ interface PortfolioRepository {
         type: TransactionType
     ): Result<Unit> // Просто сообщаем об успехе/неудаче
     
-    // New method to reset portfolio data
     suspend fun resetPortfolio(): Result<Unit>
 }
 
