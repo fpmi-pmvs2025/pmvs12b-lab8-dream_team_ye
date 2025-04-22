@@ -1,7 +1,7 @@
 package com.mockcrypto.data.repository
 
 import android.content.Context
-import com.mockcrypto.data.mapper.CryptoMapper
+import com.mockcrypto.data.remote.mapper.CryptoMapper
 import com.mockcrypto.data.remote.ApiServiceFactory
 import com.mockcrypto.data.remote.CoinGeckoApiService
 import com.mockcrypto.domain.model.CryptoCurrency
@@ -54,6 +54,7 @@ class CoinGeckoCryptoRepository(
         }
     }
 
+    // id - comma separated list of ids
     override suspend fun getCryptoDetails(id: String): Result<CryptoCurrency> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getCoinMarkets(

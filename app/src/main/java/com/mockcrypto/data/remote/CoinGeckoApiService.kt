@@ -1,8 +1,8 @@
 package com.mockcrypto.data.remote
 
-import com.mockcrypto.data.model.CryptoMarketData
-import com.mockcrypto.data.model.HistoricalDataResponse
-import com.mockcrypto.data.model.SearchResult
+import com.mockcrypto.data.remote.model.CryptoMarketData
+import com.mockcrypto.data.remote.model.HistoricalDataResponse
+import com.mockcrypto.data.remote.model.SearchResult
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

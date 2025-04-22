@@ -63,6 +63,8 @@
     <string name="circulating_supply">Circulating Supply</string>
     <string name="all_time_high">All Time High</string>
     <string name="no_data_available">No data available</string>
+    <string name="percent_change_24h">24h Change</string>
+    <string name="max_supply">Max Supply</string>
 
     <!-- Profile screen strings -->
     <string name="profile_title">Profile</string>

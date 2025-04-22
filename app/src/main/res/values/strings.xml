@@ -62,6 +62,8 @@
     <string name="circulating_supply">В обращении</string>
     <string name="all_time_high">Исторический максимум</string>
     <string name="no_data_available">Нет данных</string>
+    <string name="percent_change_24h">Изменение за 24ч</string>
+    <string name="max_supply">Максимальное предложение</string>
 
     <!-- Profile screen strings -->
     <string name="profile_title">Профиль</string>

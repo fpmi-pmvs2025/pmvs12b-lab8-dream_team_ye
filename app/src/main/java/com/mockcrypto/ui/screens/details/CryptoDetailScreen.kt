@@ -245,27 +245,46 @@ fun CryptoDetailScreen(
                                 )
                                 
                                 Spacer(modifier = Modifier.height(16.dp))
+
+                                crypto.marketCap?.let { 
+                                    MarketInfoRow(
+                                        label = stringResource(R.string.market_cap),
+                                        value = "$$it"
+                                    )
+                                }
                                 
-                                // Mock market data
+                                crypto.volume24h?.let { 
+                                    MarketInfoRow(
+                                        label = stringResource(R.string.volume_24h),
+                                        value = "$$it"
+                                    )
+                                }
+                                
+                                crypto.circulatingSupply?.let { 
+                                    MarketInfoRow(
+                                        label = stringResource(R.string.circulating_supply),
+                                        value = "$it ${crypto.symbol}"
+                                    )
+                                }
+                                
+                                crypto.allTimeHigh?.let { 
+                                    MarketInfoRow(
+                                        label = stringResource(R.string.all_time_high),
+                                        value = "$$it"
+                                    )
+                                }
+
                                 MarketInfoRow(
-                                    label = stringResource(R.string.market_cap),
-                                    value = "$238,456,789,123"
+                                    label = stringResource(R.string.percent_change_24h),
+                                    value = "${crypto.changePercent24h}%"
                                 )
                                 
-                                MarketInfoRow(
-                                    label = stringResource(R.string.volume_24h),
-                                    value = "$12,345,678,901"
-                                )
-                                
-                                MarketInfoRow(
-                                    label = stringResource(R.string.circulating_supply),
-                                    value = "${(Math.random() * 20).toInt()} M ${crypto.symbol}"
-                                )
-                                
-                                MarketInfoRow(
-                                    label = stringResource(R.string.all_time_high),
-                                    value = "$${(crypto.price.toDouble() * (1 + Math.random())).toBigDecimal().setScale(2, BigDecimal.ROUND_HALF_UP)}"
-                                )
+                                crypto.maxSupply?.let {
+                                    MarketInfoRow(
+                                        label = stringResource(R.string.max_supply),
+                                        value = "$it ${crypto.symbol}"
+                                    )
+                                }
                             }
                         }
                     }
