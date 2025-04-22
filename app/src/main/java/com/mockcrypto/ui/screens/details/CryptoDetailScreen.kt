@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mockcrypto.R
 import com.mockcrypto.domain.model.TransactionType
+import com.mockcrypto.ui.components.SparklineChart
 import com.mockcrypto.ui.screens.portfolio.PortfolioViewModel
 import java.math.BigDecimal
 import androidx.compose.ui.platform.LocalContext
@@ -166,21 +167,38 @@ fun CryptoDetailScreen(
                                 
                                 Spacer(modifier = Modifier.height(8.dp))
                                 
-                                // Mock chart placeholder
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.surfaceVariant,
-                                            shape = RoundedCornerShape(8.dp)
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.chart_placeholder),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                // Price chart
+                                if (crypto.sparklineData != null && crypto.sparklineData.isNotEmpty()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .padding(horizontal = 4.dp, vertical = 12.dp)
+                                    ) {
+                                        SparklineChart(
+                                            sparklineData = crypto.sparklineData,
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                                shape = RoundedCornerShape(8.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.chart_placeholder),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
                             }
                         }

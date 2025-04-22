@@ -9,5 +9,6 @@ data class CryptoCurrency(
     val price: BigDecimal,
     val changePercent24h: Double,
     val volume24h: BigDecimal,
-    val iconUrl: String? = null // Опциональная ссылка на иконку
+    val iconUrl: String? = null, // Опциональная ссылка на иконку
+    val sparklineData: List<BigDecimal>? = null // 7-day price sparkline data
 )

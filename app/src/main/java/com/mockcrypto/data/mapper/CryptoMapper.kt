@@ -17,7 +17,8 @@ object CryptoMapper {
             price = marketData.currentPrice ?: BigDecimal.ZERO,
             changePercent24h = marketData.priceChangePercentage24h ?: 0.0,
             volume24h = marketData.totalVolume ?: BigDecimal.ZERO,
-            iconUrl = marketData.image
+            iconUrl = marketData.image,
+            sparklineData = marketData.sparklineIn7d?.price
         )
     }
 

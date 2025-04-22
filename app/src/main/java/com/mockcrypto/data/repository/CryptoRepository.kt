@@ -25,7 +25,7 @@ class CoinGeckoCryptoRepository(
     companion object {
         private const val DEFAULT_CURRENCY = "usd"
         private const val DEFAULT_ORDER = "market_cap_desc"
-        private const val DEFAULT_PER_PAGE = 20
+        private const val DEFAULT_PER_PAGE = 250
         private const val DEFAULT_PRICE_CHANGE = "24h"
     }
 
@@ -36,7 +36,7 @@ class CoinGeckoCryptoRepository(
                 order = DEFAULT_ORDER,
                 perPage = DEFAULT_PER_PAGE,
                 priceChangePercentage = DEFAULT_PRICE_CHANGE,
-                sparkline = false
+                sparkline = true
             )
 
             if (response.isSuccessful) {
@@ -61,7 +61,7 @@ class CoinGeckoCryptoRepository(
                 ids = id,
                 perPage = 1,
                 priceChangePercentage = DEFAULT_PRICE_CHANGE,
-                sparkline = false
+                sparkline = true
             )
 
             if (response.isSuccessful) {

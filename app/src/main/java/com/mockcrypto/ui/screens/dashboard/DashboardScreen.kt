@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,10 +54,19 @@ fun DashboardScreen(
     var searchQuery by remember { mutableStateOf("") }
     val pullRefreshState = rememberPullToRefreshState()
     
-    if (pullRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
-            viewModel.loadCryptoList()
+    // Detect UI state changes and update refresh state
+    LaunchedEffect(uiState.isLoading) {
+        if (uiState.isLoading && pullRefreshState.isRefreshing.not()) {
+            pullRefreshState.startRefresh()
+        } else if (!uiState.isLoading && pullRefreshState.isRefreshing) {
             pullRefreshState.endRefresh()
+        }
+    }
+    
+    // Handle pull-to-refresh gesture
+    LaunchedEffect(pullRefreshState.isRefreshing) {
+        if (pullRefreshState.isRefreshing) {
+            viewModel.loadCryptoList()
         }
     }
     
@@ -140,10 +150,13 @@ fun DashboardScreen(
                         }
                     }
                     
+                    // Add the PullToRefreshContainer at the top of the Box
+                    // Only show when actually refreshing
                     if (pullRefreshState.isRefreshing) {
                         PullToRefreshContainer(
                             state = pullRefreshState,
-                            modifier = Modifier.align(Alignment.TopCenter)
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            contentColor = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
