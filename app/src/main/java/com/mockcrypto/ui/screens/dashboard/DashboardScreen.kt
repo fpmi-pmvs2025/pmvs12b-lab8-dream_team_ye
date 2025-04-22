@@ -48,7 +48,9 @@ import androidx.compose.ui.platform.LocalContext
 fun DashboardScreen(
     onCryptoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DashboardViewModel = viewModel(factory = DashboardViewModel.Factory(LocalContext.current))
+    viewModel: DashboardViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = DashboardViewModel.Factory()
+    )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }

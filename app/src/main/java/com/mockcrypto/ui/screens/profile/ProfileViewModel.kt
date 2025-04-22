@@ -1,19 +1,13 @@
 package com.mockcrypto.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mockcrypto.data.repository.MockPortfolioRepository
-import com.mockcrypto.data.repository.MockSettingsRepository
-import com.mockcrypto.data.repository.MockUserRepository
+import com.mockcrypto.di.ServiceLocator
 import com.mockcrypto.domain.model.ThemeMode
 import com.mockcrypto.domain.model.UserProfile
 import com.mockcrypto.domain.model.UserSettings
-import com.mockcrypto.domain.usecase.GetUserProfileUseCase
-import com.mockcrypto.domain.usecase.GetUserSettingsUseCase
-import com.mockcrypto.domain.usecase.LogoutUseCase
 import com.mockcrypto.domain.usecase.ProfileUseCases
-import com.mockcrypto.domain.usecase.ResetPortfolioUseCase
-import com.mockcrypto.domain.usecase.UpdateThemeModeUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,18 +24,7 @@ data class ProfileUiState(
 )
 
 class ProfileViewModel : ViewModel() {
-    // Todo: Replace with dependency injection
-    private val userRepository = MockUserRepository()
-    private val settingsRepository = MockSettingsRepository()
-    private val portfolioRepository = MockPortfolioRepository()
-    
-    private val profileUseCases = ProfileUseCases(
-        getUserProfile = GetUserProfileUseCase(userRepository),
-        logout = LogoutUseCase(userRepository),
-        getUserSettings = GetUserSettingsUseCase(settingsRepository),
-        updateThemeMode = UpdateThemeModeUseCase(settingsRepository),
-        resetPortfolio = ResetPortfolioUseCase(portfolioRepository)
-    )
+    private val profileUseCases: ProfileUseCases = ServiceLocator.provideProfileUseCases()
     
     private val _uiState = MutableStateFlow(ProfileUiState(isLoading = true))
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -218,5 +201,18 @@ class ProfileViewModel : ViewModel() {
     
     fun resetOperationStatus() {
         _uiState.update { it.copy(operationSuccess = null, operationMessage = null) }
+    }
+    
+    /**
+     * Factory для создания ProfileViewModel
+     */
+    class Factory : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(ProfileViewModel::class.java)) {
+                return ProfileViewModel() as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 } 

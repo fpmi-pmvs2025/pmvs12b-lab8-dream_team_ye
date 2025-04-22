@@ -63,8 +63,12 @@ fun CryptoDetailScreen(
     cryptoId: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    detailViewModel: CryptoDetailViewModel = viewModel(factory = CryptoDetailViewModel.Factory(LocalContext.current)),
-    portfolioViewModel: PortfolioViewModel = viewModel()
+    detailViewModel: CryptoDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = CryptoDetailViewModel.Factory()
+    ),
+    portfolioViewModel: PortfolioViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = PortfolioViewModel.Factory()
+    )
 ) {
     val detailUiState by detailViewModel.uiState.collectAsStateWithLifecycle()
     val portfolioUiState by portfolioViewModel.uiState.collectAsStateWithLifecycle()

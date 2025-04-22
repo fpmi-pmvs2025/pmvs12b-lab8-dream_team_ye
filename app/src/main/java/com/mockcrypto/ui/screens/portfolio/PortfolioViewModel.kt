@@ -1,16 +1,13 @@
 package com.mockcrypto.ui.screens.portfolio
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mockcrypto.data.repository.MockPortfolioRepository
+import com.mockcrypto.di.ServiceLocator
 import com.mockcrypto.domain.model.DemoAccountState
 import com.mockcrypto.domain.model.PortfolioItem
 import com.mockcrypto.domain.model.Transaction
 import com.mockcrypto.domain.model.TransactionType
-import com.mockcrypto.domain.usecase.ExecuteTradeUseCase
-import com.mockcrypto.domain.usecase.GetDemoAccountStateUseCase
-import com.mockcrypto.domain.usecase.GetPortfolioItemsUseCase
-import com.mockcrypto.domain.usecase.GetTransactionHistoryUseCase
 import com.mockcrypto.domain.usecase.PortfolioUseCases
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,14 +27,8 @@ data class PortfolioUiState(
 )
 
 class PortfolioViewModel : ViewModel() {
-    // Todo: Replace with dependency injection
-    private val repository = MockPortfolioRepository()
-    private val portfolioUseCases = PortfolioUseCases(
-        getDemoAccountState = GetDemoAccountStateUseCase(repository),
-        getPortfolioItems = GetPortfolioItemsUseCase(repository),
-        getTransactionHistory = GetTransactionHistoryUseCase(repository),
-        executeTrade = ExecuteTradeUseCase(repository)
-    )
+    
+    private val portfolioUseCases: PortfolioUseCases = ServiceLocator.providePortfolioUseCases()
     
     private val _uiState = MutableStateFlow(PortfolioUiState(isLoading = true))
     val uiState: StateFlow<PortfolioUiState> = _uiState.asStateFlow()
@@ -56,52 +47,44 @@ class PortfolioViewModel : ViewModel() {
             ) }
             
             try {
-                // Use the use cases to get the data
-                val accountStateResult = portfolioUseCases.getDemoAccountState()
-                val portfolioItemsResult = portfolioUseCases.getPortfolioItems()
+                // Получаем состояние аккаунта (включая портфель) через UseCase
+                val accountStateResult = portfolioUseCases.getAccountState()
                 val transactionsResult = portfolioUseCases.getTransactionHistory()
                 
-                // Check for errors
-                when {
-                    accountStateResult.isFailure -> {
-                        _uiState.update { it.copy(
-                            isLoading = false,
-                            error = accountStateResult.exceptionOrNull()?.message
-                        ) }
-                        return@launch
-                    }
-                    
-                    portfolioItemsResult.isFailure -> {
-                        _uiState.update { it.copy(
-                            isLoading = false,
-                            error = portfolioItemsResult.exceptionOrNull()?.message
-                        ) }
-                        return@launch
-                    }
-                    
-                    transactionsResult.isFailure -> {
-                        _uiState.update { it.copy(
-                            isLoading = false,
-                            error = transactionsResult.exceptionOrNull()?.message
-                        ) }
-                        return@launch
-                    }
-                    
-                    else -> {
-                        _uiState.update { it.copy(
-                            isLoading = false,
-                            accountState = accountStateResult.getOrNull(),
-                            portfolioItems = portfolioItemsResult.getOrNull() ?: emptyList(),
-                            transactions = transactionsResult.getOrNull() ?: emptyList(),
-                            error = null
-                        ) }
-                    }
+                // Проверяем результаты
+                if (accountStateResult.isFailure) {
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        error = accountStateResult.exceptionOrNull()?.message ?: "Failed to load account data"
+                    ) }
+                    return@launch
                 }
+                
+                if (transactionsResult.isFailure) {
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        error = transactionsResult.exceptionOrNull()?.message ?: "Failed to load transactions"
+                    ) }
+                    return@launch
+                }
+                
+                // Получаем данные
+                val accountState = accountStateResult.getOrThrow()
+                val transactions = transactionsResult.getOrThrow()
+                
+                // Обновляем UI состояние
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    accountState = accountState,
+                    portfolioItems = accountState.portfolioItems,
+                    transactions = transactions,
+                    error = null
+                ) }
             } catch (e: Exception) {
                 _uiState.update { 
                     it.copy(
                         isLoading = false,
-                        error = e.message
+                        error = e.message ?: "An unexpected error occurred"
                     ) 
                 }
             }
@@ -138,27 +121,64 @@ class PortfolioViewModel : ViewModel() {
                         else 
                             "Successfully sold $amount $symbol"
                     ) }
-                    // Refresh portfolio data after successful trade
                     loadPortfolioData()
                 } else {
                     _uiState.update { it.copy(
                         isLoading = false,
                         operationSuccess = false,
-                        operationMessage = result.exceptionOrNull()?.message
+                        operationMessage = result.exceptionOrNull()?.message ?: "Operation failed"
                     ) }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     isLoading = false,
                     operationSuccess = false,
-                    operationMessage = e.message
+                    operationMessage = e.message ?: "An unexpected error occurred"
                 ) }
             }
         }
     }
     
-    // Reset operation status after handling it in the UI
+    fun resetPortfolio() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            
+            try {
+                val result = portfolioUseCases.resetPortfolio()
+                if (result.isSuccess) {
+                    _uiState.update { it.copy(
+                        operationSuccess = true,
+                        operationMessage = "Portfolio has been reset to default state"
+                    ) }
+                    loadPortfolioData()
+                } else {
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        operationSuccess = false,
+                        operationMessage = result.exceptionOrNull()?.message ?: "Failed to reset portfolio"
+                    ) }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    operationSuccess = false,
+                    operationMessage = e.message ?: "An unexpected error occurred"
+                ) }
+            }
+        }
+    }
+    
     fun resetOperationStatus() {
         _uiState.update { it.copy(operationSuccess = null, operationMessage = null) }
+    }
+
+    class Factory : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(PortfolioViewModel::class.java)) {
+                return PortfolioViewModel() as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 } 
