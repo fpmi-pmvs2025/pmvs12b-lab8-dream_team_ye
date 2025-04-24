@@ -1,7 +1,6 @@
 ---
 layout: home
 title: Главная
-nav_order: 1
 ---
 
 # MockCrypto

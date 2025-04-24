@@ -1,7 +1,6 @@
 ---
-layout: default
+layout: page
 title: Диаграмма файлов приложения
-nav_order: 5
 ---
 
 # Диаграмма файлов приложения

@@ -1,7 +1,6 @@
 ---
 layout: page
 title: Презентация проекта
-nav_order: 7
 ---
 
 # Презентация проекта MockCrypto

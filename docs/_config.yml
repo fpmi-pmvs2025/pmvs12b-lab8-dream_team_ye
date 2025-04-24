@@ -10,3 +10,20 @@ plugins:
 minima:
   skin: solarized
   date_format: "%b %-d, %Y"
+  nav_pages:
+    - index.md
+    - functional_requirements.md
+    - specification.md
+    - file_structure.md
+    - file_diagram.md
+    - database_schema.md
+    - presentation.md 
+
+header_pages:
+  - index.md
+  - functional_requirements.md
+  - specification.md
+  - file_structure.md
+  - file_diagram.md
+  - database_schema.md
+  - presentation.md
