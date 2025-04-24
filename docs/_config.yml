@@ -1,5 +1,5 @@
-title: "TODO"
-description: "TODO"
+title: "MockCrypto"
+description: "Мобильное приложение для отслеживания курсов криптовалюты и демо трейдинга"
 
 markdown: kramdown
 remote_theme: jekyll/minima@master
@@ -10,5 +10,3 @@ plugins:
 minima:
   skin: solarized
   date_format: "%b %-d, %Y"
-  social_links:
-    github: TODO
