@@ -1,0 +1,14 @@
+title: "TODO"
+description: "TODO"
+
+markdown: kramdown
+remote_theme: jekyll/minima@master
+
+plugins:
+  - jekyll-remote-theme
+
+minima:
+  skin: solarized
+  date_format: "%b %-d, %Y"
+  social_links:
+    github: TODO
