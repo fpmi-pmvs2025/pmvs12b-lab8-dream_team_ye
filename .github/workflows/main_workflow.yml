@@ -63,30 +63,37 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleDebug --no-daemon  # TODO: change to assembleRelease. Now debug because you can't run release app on your phone without signing it
 
+      - name: Get short SHA
+        id: short_sha
+        run: echo "SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_OUTPUT
+        
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-unsigned
+          name: app-release-unsigned-${{ steps.short_sha.outputs.SHA }}
           path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 5
 
   attach-to-release:
     name: Attach APK to Release
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
+      - name: Get short SHA
+        id: short_sha
+        run: echo "SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_OUTPUT
+
       - name: Download APK from artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: main_workflow.yml
-          name: app-release-unsigned
+          name: app-release-unsigned-${{ steps.short_sha.outputs.SHA }}
           path: artifacts
-          
-      - name: Attach APK to Release
+
+      - name: Attach APK and Commit to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/app-release-unsigned.apk
+          files: artifacts/app-release-unsigned-${{ steps.short_sha.outputs.SHA }}.apk
           token: ${{ secrets.GITHUB_TOKEN }}
