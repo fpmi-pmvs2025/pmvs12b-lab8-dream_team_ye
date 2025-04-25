@@ -136,15 +136,15 @@ graph TD
 1. **Запуск приложения** — переход к экрану входа/регистрации
 2. **Вход пользователя** — регистрация/логин
 3. **Дашборд** — показ списка криптовалют, поиск, фильтрация, просмотр графиков
-- [Дашборд](https://github.com/fpmi-pmvs2025/pmvs12b-lab8-dream_team_ye/blob/main/screenshots/main_screen.png)
+- [Дашборд](./screenshots/main_screen.png)
 4. **Детальный экран монеты** — просмотр информации, графика, добавление в портфель
-- [Детали криптовалюты](../screenshots/crypto_detail_screen.png)
+- [Детали криптовалюты](./screenshots/crypto_detail_screen.png)
 5. **Портфель** — отображение активов, аналитика, прибыль/убыток, удаление/редактирование
-- [Портфель](../screenshots/portfolio_screen.png)
+- [Портфель](./screenshots/portfolio_screen.png)
 6. **История операций** — просмотр всех совершённых сделок
-- [История транзакций](../screenshots/transactions.png)
+- [История транзакций](./screenshots/transactions.png)
 7. **Профиль** — смена данных, переключение темы, выход из аккаунта
-- [Профиль пользователя](../screenshots/profile_screen.png)
+- [Профиль пользователя](./screenshots/profile_screen.png)
 
 ## Технологический стек
 
@@ -168,10 +168,10 @@ graph TD
 
 ## Скриншоты приложения
 
-- ![Главный экран](../screenshots/main_screen.png)
-- ![Портфель](../screenshots/portfolio_screen.png)
-- ![Детали криптовалюты](../screenshots/crypto_detail_screen.png)
-- ![Профиль пользователя](../screenshots/profile_screen.png)
+- ![Главный экран](./screenshots/main_screen.png)
+- ![Портфель](./screenshots/portfolio_screen.png)
+- ![Детали криптовалюты](./screenshots/crypto_detail_screen.png)
+- ![Профиль пользователя](./screenshots/profile_screen.png)
 
 ## Участие в разработке
 
