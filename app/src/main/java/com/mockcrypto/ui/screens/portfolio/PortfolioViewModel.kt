@@ -26,18 +26,18 @@ data class PortfolioUiState(
     val operationMessage: String? = null
 )
 
-class PortfolioViewModel : ViewModel() {
+open class PortfolioViewModel : ViewModel() {
     
     private val portfolioUseCases: PortfolioUseCases = ServiceLocator.providePortfolioUseCases()
     
-    private val _uiState = MutableStateFlow(PortfolioUiState(isLoading = true))
+    val _uiState = MutableStateFlow(PortfolioUiState(isLoading = true))
     val uiState: StateFlow<PortfolioUiState> = _uiState.asStateFlow()
     
     init {
         loadPortfolioData()
     }
     
-    fun loadPortfolioData() {
+    open fun loadPortfolioData() {
         viewModelScope.launch {
             _uiState.update { it.copy(
                 isLoading = true, 
