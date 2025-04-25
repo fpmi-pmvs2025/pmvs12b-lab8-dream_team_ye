@@ -49,7 +49,7 @@ class PortfolioScreenTest {
             )
         }
         // Замените на актуальный текст заголовка, если он отличается
-        composeTestRule.onNodeWithText("Демо Портфель", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(R.string.portfolio_title.toString(), substring = true).assertIsDisplayed()
     }
 
     @Test
