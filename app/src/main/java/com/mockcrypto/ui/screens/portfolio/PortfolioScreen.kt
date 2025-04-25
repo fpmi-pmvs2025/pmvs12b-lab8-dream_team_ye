@@ -45,7 +45,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -206,13 +209,17 @@ fun PortfolioScreen(
 @Composable
 private fun LoadingIndicator(modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("LoadingIndicator"),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.semantics { contentDescription = "Loading" }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = stringResource(R.string.loading))
         }
@@ -372,7 +379,7 @@ fun PortfolioItemCard(
 ) {
     Card(
         onClick = onItemClick,
-        modifier = modifier,
+        modifier = modifier.testTag("PortfolioItemCard_" + portfolioItem.cryptoId),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
@@ -464,7 +471,7 @@ private fun EmptyPortfolioMessage(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.testTag("EmptyPortfolioMessage"),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
