@@ -168,10 +168,10 @@ graph TD
 
 ## Скриншоты приложения
 
-- [Главный экран](../screenshots/main_screen.png)
-- [Портфель](../screenshots/portfolio_screen.png)
-- [Детали криптовалюты](../screenshots/crypto_detail_screen.png)
-- [Профиль пользователя](../screenshots/profile_screen.png)
+- ![Главный экран](../screenshots/main_screen.png)
+- ![Портфель](../screenshots/portfolio_screen.png)
+- ![Детали криптовалюты](../screenshots/crypto_detail_screen.png)
+- ![Профиль пользователя](../screenshots/profile_screen.png)
 
 ## Участие в разработке
 
