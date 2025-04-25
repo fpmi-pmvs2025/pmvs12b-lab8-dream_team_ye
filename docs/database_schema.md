@@ -41,7 +41,7 @@ title: Схема базы данных
 
 ## Entity-Relationship Diagram
 
-```
+```mermaid
 erDiagram
     CRYPTOCURRENCY {
         string id PK
