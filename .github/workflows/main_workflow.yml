@@ -69,11 +69,16 @@ jobs:
         id: short_sha
         run: echo "SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_OUTPUT
         
+      - name: Rename APK with SHA
+        run: |
+          mkdir -p ./artifacts
+          cp app/build/outputs/apk/debug/app-debug.apk ./artifacts/app-debug-${{ steps.short_sha.outputs.SHA }}.apk
+        
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-unsigned-${{ steps.short_sha.outputs.SHA }}
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          path: artifacts/app-debug-${{ steps.short_sha.outputs.SHA }}.apk
 
   attach-to-release:
     name: Attach APK to Release
@@ -95,5 +100,5 @@ jobs:
       - name: Attach APK and Commit to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/app-release-unsigned-${{ steps.short_sha.outputs.SHA }}.apk
+          files: artifacts/app-debug-${{ steps.short_sha.outputs.SHA }}.apk
           token: ${{ secrets.GITHUB_TOKEN }}
