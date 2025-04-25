@@ -9,11 +9,32 @@ title: Спецификация
 
 ### Требования к устройству
 
-TODO: Добавить требования к устройству
+- Операционная система: **Android 10 (API 29)** и выше
+- Процессор: **ARMv7, ARM64, x86, x86_64**
+- Оперативная память: **от 2 ГБ**
+- Свободное место на устройстве: **от 100 МБ**
+- Доступ к интернету для получения актуальных данных о криптовалютах
+- Разрешение экрана: **от 720x1280** (адаптивная верстка для разных размеров)
 
 ### Используемые технологии
 
-TODO: Добавить используемые технологии
+- **Kotlin** - основной язык программирования
+- **Jetpack Compose** - современный инструментарий для создания пользовательского интерфейса
+- **Material 3** - дизайн-компоненты нового поколения
+- **MVVM** - архитектурный паттерн
+- **Clean Architecture** - принципы организации кода
+- **Room** - для локального хранения данных
+- **Retrofit** - для работы с сетевыми запросами
+- **OkHttp** - низкоуровневый HTTP-клиент
+- **Gson** - сериализация/десериализация JSON
+- **Kotlin Coroutines** - асинхронное и конкурентное программирование
+- **Navigation Compose** - навигация между экранами
+- **Coil** - загрузка и отображение изображений
+- **JUnit** - модульное тестирование
+- **Mockito** - мок-объекты для unit-тестов
+- **Espresso** и **Compose UI Test** - инструментальные и UI-тесты
+- **Service Locator** - ручная реализация DI (Dependency Injection)
+- **ViewModel** и **StateFlow** - управление состоянием и жизненным циклом
 
 ## Архитектура приложения
 
@@ -24,12 +45,41 @@ TODO: Добавить используемые технологии
   - **Domain** (бизнес-логика)
   - **Data** (источники данных)
 
-### Компоненты
-- **Jetpack Compose** - для создания пользовательского интерфейса
-- **ViewModel** - для хранения и управления данными, связанными с UI
-- **Coroutines** - для асинхронных операций
-- **Room** - для локального хранения данных
-- **Retrofit** - для работы с API
+### Особенности архитектуры
+- **Service Locator** используется для внедрения зависимостей (DI) между слоями.
+- **StateFlow** и **ViewModel** обеспечивают реактивное управление состоянием UI.
+- **Repository pattern** для абстракции источников данных (локальные и сетевые).
+- **UseCase**-классы инкапсулируют бизнес-логику и используются в ViewModel.
+- **UI полностью построен на Jetpack Compose** (без XML).
+
+### Визуализация архитектуры
+
+```mermaid
+flowchart TD
+    subgraph UI [Presentation Layer]
+        A1[PortfolioScreen] --> A2[PortfolioViewModel]
+        B1[ProfileScreen] --> B2[ProfileViewModel]
+        C1[DashboardScreen] --> C2[DashboardViewModel]
+    end
+
+    subgraph Domain [Domain Layer]
+        A2 --> D1[PortfolioUseCases]
+        B2 --> D2[ProfileUseCases]
+    end
+
+    subgraph Data [Data Layer]
+        D1 --> E1[PortfolioRepository]
+        D1 --> E2[CryptoRepository]
+        D2 --> E3[UserRepository]
+        D2 --> E4[SettingsRepository]
+        E1 --> F1["Room (DB)"]
+        E2 --> F2["Retrofit (API)"]
+    end
+
+    style UI fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style Domain fill:#e8f5e9,stroke:#43a047,stroke-width:2px
+    style Data fill:#fff3e0,stroke:#fb8c00,stroke-width:2px
+```
 
 ## Интерфейс пользователя
 

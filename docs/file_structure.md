@@ -78,6 +78,38 @@ ui/
 └── common/     # Общие UI компоненты
 ```
 
+### 6. Unit-тесты (test)
+Содержит модульные тесты для бизнес-логики, моделей и отдельных функций. Используются JUnit и Mockito.
+
+```
+test/
+└── java/
+    └── com/
+        └── mockcrypto/
+            ├── PortfolioUseCasesTest.kt   # Тесты для use case слоя
+            ├── PortfolioItemTest.kt       # Тесты для моделей
+            └── ...                        # Другие unit-тесты
+```
+
+### 7. UI-тесты (androidTest)
+Содержит инструментальные и UI-тесты для проверки пользовательского интерфейса с помощью Espresso и Compose UI Test.
+
+```
+androidTest/
+└── java/
+    └── com/
+        └── mockcrypto/
+            ├── PortfolioScreenTest.kt     # UI-тесты для экрана портфеля
+            └── ...                        # Другие UI/инструментальные тесты
+```
+
+---
+
+**Кратко:**
+- Все unit-тесты располагаются в `app/src/test/java/com/mockcrypto/`.
+- Все UI- и инструментальные тесты — в `app/src/androidTest/java/com/mockcrypto/`.
+- Для тестов используются JUnit, Mockito, Espresso, Compose UI Test. 
+
 ## Ресурсы приложения
 
 ```
@@ -96,4 +128,4 @@ res/
 ├── settings.gradle.kts      # Настройки Gradle проекта
 ├── gradle.properties        # Свойства Gradle
 └── local.properties         # Локальные настройки (SDK путь)
-``` 
+```

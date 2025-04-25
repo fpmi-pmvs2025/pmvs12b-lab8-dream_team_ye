@@ -18,10 +18,38 @@ title: Главная
 
 - **Kotlin** - основной язык программирования
 - **Jetpack Compose** - современный инструментарий для создания пользовательского интерфейса
+- **Material 3** - дизайн-компоненты нового поколения
 - **MVVM** - архитектурный паттерн
 - **Clean Architecture** - принципы организации кода
 - **Room** - для локального хранения данных
 - **Retrofit** - для работы с сетевыми запросами
+- **OkHttp** - низкоуровневый HTTP-клиент
+- **Gson** - сериализация/десериализация JSON
+- **Kotlin Coroutines** - асинхронное и конкурентное программирование
+- **Navigation Compose** - навигация между экранами
+- **Coil** - загрузка и отображение изображений
+- **JUnit** - модульное тестирование
+- **Mockito** - мок-объекты для unit-тестов
+- **Espresso** и **Compose UI Test** - инструментальные и UI-тесты
+- **Service Locator** - ручная реализация DI (Dependency Injection)
+- **ViewModel** и **StateFlow** - управление состоянием и жизненным циклом
+
+## Скриншоты интерфейса
+
+- [Главный экран](screenshots/main_screen.png)
+- [Портфель](screenshots/portfolio_screen.png)
+- [Детали криптовалюты](screenshots/crypto_detail_screen.png)
+- [Профиль пользователя](screenshots/profile_screen.png)
+
+## Ссылка на репозиторий
+
+- [MockCrypto на GitHub](https://github.com/fpmi-pmvs2025/pmvs12b-lab8-dream_team_ye)
+
+### Репозитории участников проекта
+
+- [Сергиенко Лев Эдуардович](https://github.com/foreverNP)
+- [Будник Кирилл Валерьевич](https://github.com/ICraZZyBoY)
+- [Аладко Анастасия Дмитриевна](https://github.com/aladushka10)
 
 ## Навигация по документации
 
