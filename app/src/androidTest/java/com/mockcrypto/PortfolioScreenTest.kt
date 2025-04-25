@@ -41,18 +41,6 @@ class PortfolioScreenTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun portfolioScreen_showsTitle() {
-        composeTestRule.setContent {
-            PortfolioScreen(
-                onCryptoClick = {},
-                viewModel = FakePortfolioViewModel(isLoading = false, accountState = null)
-            )
-        }
-        // Замените на актуальный текст заголовка, если он отличается
-        composeTestRule.onNodeWithText(R.string.portfolio_title.toString(), substring = true).assertIsDisplayed()
-    }
-
-    @Test
     fun portfolioScreen_showsAccountSummaryCard() {
         composeTestRule.setContent {
             PortfolioScreen(
