@@ -90,7 +90,7 @@ jobs:
         run: echo "SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_OUTPUT
 
       - name: Download APK from artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v9
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: main_workflow.yml
@@ -98,7 +98,7 @@ jobs:
           path: artifacts
 
       - name: Attach APK and Commit to Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: artifacts/app-debug-${{ steps.short_sha.outputs.SHA }}.apk
           token: ${{ secrets.GITHUB_TOKEN }}
